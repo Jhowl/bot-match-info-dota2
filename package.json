@@ -1,0 +1,22 @@
+{
+  "name": "bot-dota2-telegram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "dotaconstants": "^6.31.0",
+    "lodash": "^4.17.15",
+    "telegraf": "^3.36.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
