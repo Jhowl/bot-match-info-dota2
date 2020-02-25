@@ -14,7 +14,7 @@ class DotaMatch {
     const info = {}
 
     info.match = await this.getMatchInfo(this.id)
-    info.player = await this.getPlayerBaseInfo(info.match.players)
+    info.player = await this.getPlayerMatchInfo(info.match.players)
     const content = this.getContent(info)
 
     return content
@@ -26,50 +26,36 @@ class DotaMatch {
     return res.data
   }
 
-  async getPlayerBaseInfo(players){
-    const player = {}
-    const names = []
+  async getPlayerMatchInfo(players){
+    const id =  players.findIndex(item => item.account_id === parseInt(env.steamId))
+    const player = players[id]
+    const names = players.map(item => item.personaname).filter(value => value !== undefined)
+    const hero = await this.getHero(player.hero_id)
 
-    console.log(env)
+    const itens = this.getItensNamesById([
+        player.item_0,
+        player.item_1,
+        player.item_2,
+        player.item_3,
+        player.item_4,
+        player.item_5,
+        player.item_neutral,
+    ]);
 
-    for (let i = 0, len = players.length; i < len; i++) {
-        if(players[i].account_id !== env.steamId ){
-            names.push(players[i].personaname)
-            continue;
-        }
-        console.log(players[i])
-
-        const itens = this.getItensById([
-            players[i].item_0,
-            players[i].item_1,
-            players[i].item_2,
-            players[i].item_3,
-            players[i].item_4,
-            players[i].item_5,
-        ]);
-
-        player.name = players[i].personaname
-        player.hero = await this.getHero(players[i].hero_id)
-        // player.heroThumbnail = await this.saveThumbnail(players[i].hero_id)
-        player.duration = players[i].duration
-        player.kills = players[i].kills
-        player.deaths = players[i].deaths
-        player.assists = players[i].assists
-        player.game_mode = players[i].game_mode
-        player.sideMap = players[i].isRadiant ? 'Randiant' : 'Dire'
-        player.win =  players[i].win
-        player.lose =  players[i].lose
-        player.total_gold =  players[i].total_gold
-        player.itens = itens
+    return {
+      ...player,
+      name: player.personaname,
+      hero,
+      names,
+      // player.heroThumbnail: await this.saveThumbnail(players[i].hero_id)
+      sideMap: player.isRadiant ? 'Randiant' : 'Dire',
+      itens,
+      patch: this.getDotaPatch(player.patch)
     }
-
-    player.names = names
-
-    return player
   }
 
 
-  getItensById( ids ){
+  getItensNamesById( ids ){
     const itens = []
     for (let i = 0, len = ids.length; i < len; i++) {
         if (dotaconstants.item_ids[ids[i]]){
@@ -80,9 +66,13 @@ class DotaMatch {
     return itens
   }
 
+  getDotaPatch(id){
+    return dotaconstants.patch[id].name
+  }
+
   async getHero(id){
     const res = await axios.get(url + '/heroes/')
-    let value = lodash.filter(res.data, x => x.id === id);
+    const value = lodash.filter(res.data, x => x.id === id);
 
     return value
   }
@@ -99,21 +89,26 @@ class DotaMatch {
   }
 
 	getContent({match, player}){
-		const data = {}
+    const data = {}
 		const heroName = player.hero[0].localized_name
 		const itens = player.itens.filter(value => value !== '').join(' \n ')
-		const players = player.names.filter(value => value !== undefined).join(' \n ')
+		const players = player.names.join(' \n ')
 		const itensTag = player.itens.filter(value => value !== '').join(', ')
 		const result = player.win ? 'Vitória' : 'Derrota'
 
 		data.id = match.match_id
-		data.title = `Partida jogando com ${heroName} | Dota 2`
+		data.title = `Partida jogando com ${heroName} | Dota 2 ${player.patch} by jhowl`
 		// data.thumbnail = player.heroThumbnail
-		data.description = `Partida jogando com herói ${heroName} do dota 2 no patch 7.24
-		Com o K/D/A de ${player.kills}/${player.deaths}/${player.assists} com o total de ouro (Patrimônio Líquido) de ${player.total_gold}g
+		data.description = `Partida jogando com herói ${heroName} do dota 2 no patch ${player.patch}
 
 		Jogando do lado dos ${player.sideMap} do mapa
-		ID da partida: ${data.id}
+    ID da partida: ${data.id}
+
+    Meus dados nesta partida de dota 2 jogando com ${heroName}:
+    Kills: ${player.kills},
+    Deaths: ${player.deaths},
+    Assistências: ${player.assists},
+    Total de ouro (Patrimônio Líquido): ${player.total_gold}g
 
 		Os itens que foram feitos para ${heroName} nesta partida são:
 		${itens}
@@ -121,9 +116,9 @@ class DotaMatch {
 		Acesse Meu site: https://jhowl.com
 
 		Criando um histórico (archive) de partidas e gameplays que faço e deixando salvo aqui no youtube para futuras lembranças e compartilhamento com a web.
-		Video do jogo está completo com a resolução 1080p a 60fps
+		Vídeo  do jogo está completo com a resolução 1080p a 60fps
 
-		Eu sou o agresif hamster e tambem conhecido como Jhowl.
+		Eu sou o agresif hamster e também conhecido como Jhowl.
 
 		jogadores nesta partida:
 		${players}
@@ -132,7 +127,9 @@ class DotaMatch {
 
 		#dota2 #${heroName.replace(/ /g,'')}`
 
-    data.tags = `${heroName}, dota 2, dota2 ${heroName}, partida completa de ${heroName}, jogando com ${heroName}, partida completa, ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, jhowl`
+    data.tags = `${heroName}, dota 2, dota2 ${heroName}, partida completa de ${heroName}, jogando com ${heroName},
+      partida completa, ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, jhowl,
+      ${player.patch}, ${heroName} ${player.patch}`
 
     return data;
 	}
