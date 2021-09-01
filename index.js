@@ -1,4 +1,4 @@
-const Telegraf = require('telegraf')
+const Telegraf = require('telegraf').Telegraf
 const env = require('./.env')
 const dotaInfo = require('./DotaMatch')
 
