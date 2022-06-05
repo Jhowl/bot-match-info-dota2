@@ -7,9 +7,9 @@ const env = require('../.env')
 const text = require('./text')
 
 class DotaMatch {
-	constructor(id) {
-			this.id = id
-		}
+  constructor(id) {
+    this.id = id
+  }
 
   async robot() {
     const info = {}
@@ -21,26 +21,26 @@ class DotaMatch {
     return content
   }
 
-  async getMatchInfo (id){
+  async getMatchInfo(id) {
     const res = await axios.get(url + '/matches/' + id)
 
     return res.data
   }
 
-  async getPlayerMatchInfo(players){
-    const id =  players.findIndex(item => item.account_id === parseInt(env.steamId))
+  async getPlayerMatchInfo(players) {
+    const id = players.findIndex(item => item.account_id === parseInt(env.steamId))
     const player = players[id]
     const names = players.map(item => item.personaname).filter(value => value !== undefined)
     const hero = await this.getHero(player.hero_id)
 
     const itens = this.getItensNamesById([
-        player.item_0,
-        player.item_1,
-        player.item_2,
-        player.item_3,
-        player.item_4,
-        player.item_5,
-        player.item_neutral,
+      player.item_0,
+      player.item_1,
+      player.item_2,
+      player.item_3,
+      player.item_4,
+      player.item_5,
+      player.item_neutral,
     ]);
 
     return {
@@ -56,34 +56,34 @@ class DotaMatch {
   }
 
 
-  getItensNamesById( ids ){
+  getItensNamesById(ids) {
     const itens = []
     for (let i = 0, len = ids.length; i < len; i++) {
-        if (dotaconstants.item_ids[ids[i]]){
-            itens.push(dotaconstants.items[dotaconstants.item_ids[ids[i]]].dname)
-        }
+      if (dotaconstants.item_ids[ids[i]]) {
+        itens.push(dotaconstants.items[dotaconstants.item_ids[ids[i]]].dname)
+      }
     }
 
     return itens
   }
 
-  getDotaPatch(id){
+  getDotaPatch(id) {
     return dotaconstants.patch[id].name
   }
 
-  async getHero(id){
+  async getHero(id) {
     const res = await axios.get(url + '/heroes/')
     const value = lodash.filter(res.data, x => x.id === id);
 
     return value
   }
 
-  saveThumbnail(id){
+  saveThumbnail(id) {
     const url = `https://api.opendota.com${dotaconstants.heroes[id].img}`
 
     imageDownloader.image({
-        url, url,
-        dest: `./content/${id}.png`
+      url, url,
+      dest: `./content/${id}.png`
     })
 
     return `./content/${id}.png`
