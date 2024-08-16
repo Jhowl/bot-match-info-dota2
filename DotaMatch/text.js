@@ -8,6 +8,10 @@ module.exports = ({ match, player }) => {
 
   data.id = match.match_id
   data.title = `Partida jogando com ${heroName} | Dota 2 ${player.patch} by jhowl`
+
+  const tags = `${heroName}, dota 2, dota2 ${heroName}, partida completa de ${heroName}, jogando com ${heroName}, partida completa, ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, jhowl, ${player.patch}, ${heroName} ${player.patch}, patch ${player.patch}`
+  const tagsE = `${heroName}, dota 2, dota2 ${heroName}, match with ${heroName}, match ${heroName}, dota 2 complete match , ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, ${player.patch}, ${heroName} ${player.patch}, patch ${player.patch}`
+
   data.description = `
 
   Hero ${heroName} Dota 2 patch ${player.patch}
@@ -24,17 +28,17 @@ module.exports = ({ match, player }) => {
   ${heroName} itens:
   ${itens}
 
-  site: https://jhowl.com
-
   Players:
   ${players}
 
   Result ${result}  ${heroName}
 
-  #dota2 #${heroName.replace(/ /g, '')}`
+  #dota2 #${heroName.replace(/ /g, '')}  #turbo
 
-  data.tags = `${heroName}, dota 2, dota2 ${heroName}, partida completa de ${heroName}, jogando com ${heroName}, partida completa, ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, jhowl, ${player.patch}, ${heroName} ${player.patch}, patch ${player.patch}`
-  data.tags2 = `${heroName}, dota 2, dota2 ${heroName}, match with ${heroName}, match ${heroName}, dota 2 complete match , ${player.name}, ${itensTag}, ${player.sideMap}, gameplay, game, gameplay ${heroName}, moba, ${player.patch}, ${heroName} ${player.patch}, patch ${player.patch}`
+  ${tags}
+
+  ${tagsE}
+  `
 
   return data;
 }

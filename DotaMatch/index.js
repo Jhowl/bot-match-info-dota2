@@ -1,11 +1,11 @@
+require('dotenv').config()
+
 const axios = require('axios')
 const dotaconstants = require('dotaconstants')
 const lodash = require('lodash')
 
 const url = 'https://api.opendota.com/api'
-const env = require('../.env')
 const text = require('./text')
-
 class DotaMatch {
   constructor(id) {
     this.id = id
@@ -28,7 +28,7 @@ class DotaMatch {
   }
 
   async getPlayerMatchInfo(players) {
-    const id = players.findIndex(item => item.account_id === parseInt(env.steamId))
+    const id = players.findIndex(item => item.account_id === parseInt(process.env.STEAM_ID))
     const player = players[id]
     const names = players.map(item => item.personaname).filter(value => value !== undefined)
     const hero = await this.getHero(player.hero_id)
@@ -60,7 +60,7 @@ class DotaMatch {
     const itens = []
     for (let i = 0, len = ids.length; i < len; i++) {
       if (dotaconstants.item_ids[ids[i]]) {
-        itens.push(dotaconstants.items[dotaconstants.item_ids[ids[i]]].dname)
+        itens.push(dotaconstants.items[dotaconstants.item_ids[ids[i]]]?.dname)
       }
     }
 

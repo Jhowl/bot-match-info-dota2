@@ -1,8 +1,10 @@
+
+require('dotenv').config()
 const Telegraf = require('telegraf').Telegraf
-const env = require('./.env')
 const dotaInfo = require('./DotaMatch')
 
-const telegram = new Telegraf(env.token)
+console.log('Bot is running...')
+const telegram = new Telegraf(process.env.BOT_TOKEN)
 
 function startBot() {
   telegram.start(ctx => {
@@ -23,9 +25,6 @@ telegram.hears(/(\d{10})/, async ctx => {
 
   ctx.reply(message.title)
   ctx.reply(message.description)
-  ctx.reply(message.tags)
-  ctx.reply(message.tags2)
-
 })
 
 startBot()
